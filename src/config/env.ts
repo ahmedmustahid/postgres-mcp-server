@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { connect } from "node:http2";
 dotenv.config();
 
 export function getEnvVar(name: string): string {
@@ -12,13 +13,20 @@ export function getEnvVar(name: string): string {
   return value;
 }
 
+const postgres = process.env["POSTGRES_URL"]
+  ? {
+      connectionString: getEnvVar("POSTGRES_URL")
+    }
+  : {
+      username: getEnvVar("POSTGRES_USERNAME"),
+      password: getEnvVar("POSTGRES_PASSWORD"),
+      host: getEnvVar("POSTGRES_HOST"),
+      port: parseInt(process.env.POSTGRES_PORT || "5432", 10),
+      database: getEnvVar("POSTGRES_DATABASE"),
+    };
+
 export const config = {
-  postgres: {
-    username: getEnvVar("POSTGRES_USERNAME"),
-    password: getEnvVar("POSTGRES_PASSWORD"),
-    host: getEnvVar("POSTGRES_HOST"),
-    database: getEnvVar("POSTGRES_DATABASE"),
-  },
+  postgres,
   server: {
     port: parseInt(process.env.PORT || "3000", 10),
     host: process.env.HOST || "0.0.0.0",
